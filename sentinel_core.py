@@ -88,7 +88,7 @@ class SentinelCore:
     def run_background_tasks(self):
         """Creates and runs the system tray icon."""
         try:
-            image = Image.open("assets/icon.png")
+            image = Image.open("assets/icon.ico")
         except FileNotFoundError:
             image = Image.new('RGB', (64, 64), color='black')
         

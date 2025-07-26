@@ -9,11 +9,12 @@ from sentinel_core import SentinelCore
 from listener import listen_for_command, initialize_listener
 import json
 from api_handler import get_weather
+from calendar_handler import get_upcoming_events
 
 INTENT_PROMPT = """
 You are a command router. Based on the user's command, what is the primary intent?
 Your response must be ONLY ONE of these keywords:
-wallpaper, cpu, ram, dashboard, weather, launch_app, open_website, ask.
+wallpaper, cpu, ram, dashboard, weather, launch_app, open_website, calendar, ask.
 
 User command: "{user_command}"
 Keyword:
@@ -24,6 +25,14 @@ if __name__ == "__main__":
     root.withdraw()
 
     sentinel = SentinelCore(main_tk_root=root)
+
+    def handle_calendar_thread():
+        """Handles the blocking calendar API call in a background thread."""
+        response = get_upcoming_events()
+        if response:
+            # Once we have the response, schedule the UI updates to run on the main thread
+            root.after(0, lambda: ResponseWindow(response_text=response))
+            speak(response)
 
             # --- 1. Define All Handlers ---
     def process_command(command_text):
@@ -37,8 +46,15 @@ if __name__ == "__main__":
 
         response_text = ""
 
-        # --- Parameter-less Commands ---
-        if "wallpaper" in intent:
+        # --- This is the key change ---
+        if "calendar" in intent:
+            # For the slow calendar command, start it in a thread and exit the function.
+            # The thread itself will handle showing the response window.
+            threading.Thread(target=handle_calendar_thread, daemon=True).start()
+            return
+
+        # --- All other fast commands are handled directly ---
+        elif "wallpaper" in intent:
             sentinel.set_random_wallpaper()
             response_text = "As you wish. The wallpaper has been changed."
         elif "cpu" in intent:
