@@ -1,14 +1,57 @@
+from dashboard_ui import DashboardWindow
 import pystray
 from PIL import Image
 import ctypes
 import random
 from pathlib import Path
 import psutil
+import webbrowser
+import os
 
 class SentinelCore:
     def __init__(self, main_tk_root):
         self.root = main_tk_root
         self.current_wallpaper = None
+        self.dashboard_window = None 
+
+    # Add these two methods inside the SentinelCore class
+
+    def open_application(self, app_name):
+        """Attempts to open an application by its name."""
+        try:
+            # os.startfile is a versatile way to open files or apps on Windows
+            os.startfile(app_name)
+            return f"Opening {app_name}..."
+        except Exception as e:
+            print(f"Error opening application: {e}")
+            return f"Sorry, I could not find or open {app_name}."
+
+    def open_website(self, url):
+        """Opens a URL in the default web browser."""
+        # Ensure the URL has a scheme for the browser to open correctly
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        try:
+            webbrowser.open(url, new=2) # new=2 opens in a new tab
+            return f"Opening {url} in your browser."
+        except Exception as e:
+            print(f"Error opening website: {e}")
+            return "Sorry, there was an error opening the website."
+
+    def _create_dashboard_window(self):
+        """Creates the dashboard window instance."""
+        self.dashboard_window = DashboardWindow(sentinel_instance=self)
+
+    def open_dashboard(self):
+        """
+        Opens the dashboard window. Prevents opening multiple instances.
+        Schedules the creation on the main UI thread.
+        """
+        if self.dashboard_window is None or not self.dashboard_window.winfo_exists():
+            self.root.after(0, self._create_dashboard_window)
+        else:
+            self.dashboard_window.focus() # If already open, bring to front
+
 
     def set_wallpaper(self, image_path):
         """Sets the desktop wallpaper and updates the tracker."""
@@ -50,6 +93,7 @@ class SentinelCore:
             image = Image.new('RGB', (64, 64), color='black')
         
         menu = (
+            pystray.MenuItem('Dashboard', self.open_dashboard), # New option
             pystray.MenuItem('Set New Wallpaper', self.set_random_wallpaper),
             pystray.MenuItem('Exit', self.on_exit_clicked)
         )
