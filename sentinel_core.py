@@ -1,4 +1,3 @@
-from dashboard_ui import DashboardWindow
 import pystray
 from PIL import Image
 import ctypes
@@ -7,6 +6,15 @@ from pathlib import Path
 import psutil
 import webbrowser
 import os
+import sys
+from dashboard_ui import DashboardWindow
+
+# This block determines the correct base path for assets
+if getattr(sys, 'frozen', False):
+    BASE_PATH = sys._MEIPASS
+else:
+    BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 class SentinelCore:
     def __init__(self, main_tk_root):
@@ -14,12 +22,8 @@ class SentinelCore:
         self.current_wallpaper = None
         self.dashboard_window = None 
 
-    # Add these two methods inside the SentinelCore class
-
     def open_application(self, app_name):
-        """Attempts to open an application by its name."""
         try:
-            # os.startfile is a versatile way to open files or apps on Windows
             os.startfile(app_name)
             return f"Opening {app_name}..."
         except Exception as e:
@@ -27,42 +31,33 @@ class SentinelCore:
             return f"Sorry, I could not find or open {app_name}."
 
     def open_website(self, url):
-        """Opens a URL in the default web browser."""
-        # Ensure the URL has a scheme for the browser to open correctly
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         try:
-            webbrowser.open(url, new=2) # new=2 opens in a new tab
+            webbrowser.open(url, new=2)
             return f"Opening {url} in your browser."
         except Exception as e:
             print(f"Error opening website: {e}")
             return "Sorry, there was an error opening the website."
 
     def _create_dashboard_window(self):
-        """Creates the dashboard window instance."""
         self.dashboard_window = DashboardWindow(sentinel_instance=self)
 
     def open_dashboard(self):
-        """
-        Opens the dashboard window. Prevents opening multiple instances.
-        Schedules the creation on the main UI thread.
-        """
         if self.dashboard_window is None or not self.dashboard_window.winfo_exists():
             self.root.after(0, self._create_dashboard_window)
         else:
-            self.dashboard_window.focus() # If already open, bring to front
-
+            self.dashboard_window.focus()
 
     def set_wallpaper(self, image_path):
-        """Sets the desktop wallpaper and updates the tracker."""
         absolute_path = image_path.resolve()
         ctypes.windll.user32.SystemParametersInfoW(20, 0, str(absolute_path), 3)
         print(f"Wallpaper changed to: {image_path.name}")
         self.current_wallpaper = image_path
 
     def set_random_wallpaper(self):
-        """Picks a random wallpaper that is different from the current one."""
-        wallpaper_dir = Path("assets/wallpapers")
+        # Use BASE_PATH to find the wallpapers directory reliably
+        wallpaper_dir = Path(os.path.join(BASE_PATH, 'assets', 'wallpapers'))
         images = list(wallpaper_dir.glob("*.jpg")) + list(wallpaper_dir.glob("*.png"))
 
         if not images:
@@ -81,36 +76,30 @@ class SentinelCore:
         self.set_wallpaper(new_wallpaper)
 
     def on_exit_clicked(self, icon, item):
-        """Stops the tray icon and quits the main application."""
         icon.stop()
         self.root.quit()
 
     def run_background_tasks(self):
-        """Creates and runs the system tray icon."""
         try:
-            image = Image.open("assets/icon.ico")
+            # Use BASE_PATH to find the icon reliably
+            icon_path = os.path.join(BASE_PATH, 'assets', 'icon.ico')
+            image = Image.open(icon_path)
         except FileNotFoundError:
             image = Image.new('RGB', (64, 64), color='black')
         
         menu = (
-            pystray.MenuItem('Dashboard', self.open_dashboard), # New option
+            pystray.MenuItem('Dashboard', self.open_dashboard),
             pystray.MenuItem('Set New Wallpaper', self.set_random_wallpaper),
             pystray.MenuItem('Exit', self.on_exit_clicked)
         )
         
-        # The order of arguments is now correct: name, icon, title, menu
-        icon = pystray.Icon("Sentinel", image, "Sentinel Assistant", menu)
+        icon = pystray.Icon("Otto", image, "Otto Assistant", menu)
         icon.run()
 
-    # Add these two methods inside the SentinelCore class in sentinel_core.py
-
     def get_cpu_usage(self):
-        """Returns the current CPU usage as a percentage."""
-        # The interval allows the system to get a more accurate reading
         usage = psutil.cpu_percent(interval=1)
         return f"Current CPU load is at {usage} percent."
 
     def get_ram_usage(self):
-        """Returns the current RAM usage as a percentage."""
         usage = psutil.virtual_memory().percent
         return f"Current memory usage is at {usage} percent."

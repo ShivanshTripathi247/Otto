@@ -1,5 +1,9 @@
 venv/
+dist/
+build/
 __pycache__/
+OllamaSetup.exe
+main.spec
 *.pyc
 *.pyo
 *.pyd

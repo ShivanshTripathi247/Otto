@@ -2,14 +2,24 @@ import customtkinter as ctk
 import threading
 import keyboard
 import time
-from llm_handler import ask_sentinel
-from ui_manager import StartupAnimation, CommandPalette, ResponseWindow, ListeningIndicator
+import json
+import sys
+import os
+from llm_handler import ask_sentinel, model_exists, pull_model_with_progress
+from ui_manager import StartupAnimation, CommandPalette, ResponseWindow, ListeningIndicator, ModelDownloaderWindow
 from speaker import speak
 from sentinel_core import SentinelCore
 from listener import listen_for_command, initialize_listener
-import json
 from api_handler import get_weather
 from calendar_handler import get_upcoming_events
+
+
+if getattr(sys, 'frozen', False):
+    BASE_PATH = sys._MEIPASS
+else:
+    BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
+
 
 INTENT_PROMPT = """
 You are a command router. Based on the user's command, what is the primary intent?
@@ -126,4 +136,32 @@ if __name__ == "__main__":
     startup_app = StartupAnimation(text_to_display=greeting)
 
     print("Startup sequence complete. Sentinel is ready.")
+    root.mainloop()
+
+    def start_full_app():
+        """Contains the logic to start the main application after setup."""
+        keyboard.add_hotkey('ctrl+space', lambda: root.after(0, open_command_palette_ui))
+        keyboard.add_hotkey('ctrl+alt+space', voice_command_thread_handler)
+        print("Hotkeys registered.")
+
+        threading.Thread(target=initialize_listener, daemon=True).start()
+        threading.Thread(target=sentinel.run_background_tasks, daemon=True).start()
+        
+        greeting = ask_sentinel(f"Generate a very short, futuristic greeting (NOT MORE THAN 20 WORDS). It is currently {time.strftime('%I:%M %p')} on a {time.strftime('%A')}.")
+        startup_app = StartupAnimation(text_to_display=greeting)
+        print("Startup sequence complete. Sentinel is ready.")
+
+    # --- New Startup Logic ---
+    if not model_exists():
+        downloader_window = ModelDownloaderWindow()
+        def update_dl_status(text):
+            root.after(0, downloader_window.update_status, text)
+        def on_dl_complete():
+            root.after(0, downloader_window.destroy)
+            start_full_app()
+        threading.Thread(target=pull_model_with_progress, args=("phi3", update_dl_status, on_dl_complete), daemon=True).start()
+    else:
+        print("AI model 'phi3' is ready.")
+        start_full_app()
+
     root.mainloop()
