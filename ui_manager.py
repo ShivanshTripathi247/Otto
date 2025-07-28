@@ -1,27 +1,22 @@
 import customtkinter as ctk
 
 
-# Add this new class to your ui_manager.py file
-class ModelDownloaderWindow(ctk.CTkToplevel):
-    def __init__(self):
+# Add this new class to the end of ui_manager.py
+class ErrorWindow(ctk.CTkToplevel):
+    def __init__(self, title, message):
         super().__init__()
-        self.title("First-Time Setup")
-        self.geometry("400x120")
+        self.title(title)
+        self.geometry("450x150")
         self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", lambda: None) # Prevent closing
+        self.attributes("-topmost", True)
 
-        ctk.CTkLabel(self, text="AI Model Not Found", font=("Roboto", 16, "bold")).pack(pady=5)
-        self.status_label = ctk.CTkLabel(self, text="Preparing to download (this may take several minutes)...")
-        self.status_label.pack(pady=5)
-        
-        # An indeterminate progress bar shows activity without needing an exact percentage
-        self.progress_bar = ctk.CTkProgressBar(self, mode='indeterminate')
-        self.progress_bar.pack(pady=10, padx=20, fill="x")
-        self.progress_bar.start()
+        main_frame = ctk.CTkFrame(self)
+        main_frame.pack(expand=True, fill="both", padx=10, pady=10)
 
-    def update_status(self, text):
-        """Updates the status text on the window."""
-        self.status_label.configure(text=text)
+        ctk.CTkLabel(main_frame, text=message, font=("Roboto", 14), wraplength=430).pack(expand=True)
+        ctk.CTkButton(main_frame, text="OK", command=self.destroy).pack(pady=10)
+
+
 
 
 class StartupAnimation(ctk.CTkToplevel):

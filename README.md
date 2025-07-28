@@ -12,13 +12,15 @@ Get the latest version of Otto Assistant here:
 
 *[➡ Download Otto-Setup.exe (v1.0.0) ⬅](https://github.com/ShivanshTripathi247/Otto/releases/tag/v1.0.0)*
 
-(Note:* You will need to replace the above link with the actual link to your setup file once you upload it to a GitHub Release.)*
+
 
 Simply run the downloaded Otto-Setup.exe. The installer will guide you through the process, which includes:
 1.  Installing the Otto Assistant application.
 2.  Installing the Ollama AI engine, which powers the assistant.
-3.  On the first run, the assistant will automatically download the required phi-3 AI model. This is a one-time setup and may take a few minutes depending on your internet connection.
-
+3.  On the first run, the assistant will automatically download the required phi-3 AI model from your terminal. This is a one-time setup and may take a few minutes depending on your internet connection.
+4. close the terminal once you see this in your terminal.
+![Otto Assistant](assets/install.png)
+5. Enjoy your new AI powered desktop assistant
 ---
 
 ## ✨ Features
@@ -72,4 +74,4 @@ If you wish to run or modify the project from the source code, follow these step
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/ShivanshTripathi247/Otto.git
-cd your-repo-name
+cd Otto
