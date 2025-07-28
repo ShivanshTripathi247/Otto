@@ -10,7 +10,7 @@
 
 Get the latest version of Otto Assistant here:
 
-*[➡ Download Otto-Setup.exe (v1.0) ⬅](https://github.com/your-username/your-repo-name/releases/latest/download/Otto-Setup.exe)*
+*[➡ Download Otto-Setup.exe (v1.0.0) ⬅](https://github.com/ShivanshTripathi247/Otto/releases/tag/v1.0.0)*
 
 (Note:* You will need to replace the above link with the actual link to your setup file once you upload it to a GitHub Release.)*
 
@@ -71,5 +71,5 @@ If you wish to run or modify the project from the source code, follow these step
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+git clone https://github.com/ShivanshTripathi247/Otto.git
 cd your-repo-name
