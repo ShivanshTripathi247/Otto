@@ -10,7 +10,7 @@
 
 Get the latest version of Otto Assistant here:
 
-*[➡ Download Otto-Setup.exe (v1.0.0) ⬅](https://github.com/ShivanshTripathi247/Otto/releases/tag/v1.0.0)*
+**[➡ Download Otto-Setup.exe (v1.0.0) ⬅](https://github.com/ShivanshTripathi247/Otto/releases/tag/v1.0.0)**
 
 
 
@@ -20,7 +20,13 @@ Simply run the downloaded Otto-Setup.exe. The installer will guide you through t
 3.  On the first run, the assistant will automatically download the required phi-3 AI model from your terminal. This is a one-time setup and may take a few minutes depending on your internet connection.
 4. close the terminal once you see this in your terminal.
 ![Otto Assistant](assets/install.png)
-5. Enjoy your new AI powered desktop assistant
+5. If you face any error during phi-3 installation in your terminal, run this command to install it successfully
+```bash
+ollama run phi3
+```
+
+6. Enjoy your new AI powered desktop assistant using hotkey
+```ctrl + space```
 ---
 
 ## ✨ Features
